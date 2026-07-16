@@ -49,3 +49,7 @@ class ConfigurationError(ResumeScreeningError):
     """
 
     pass
+
+class ResumeParserError(ResumeScreeningError):
+    """Raised when resume metadata parsing fails."""
+    pass
