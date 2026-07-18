@@ -2,10 +2,10 @@ from pathlib import Path
 import pickle
 
 from src.parser.schema import ResumeMetadata
-from src.utils.logger import get_logger
-from src.utils.exceptions import (
+from src.exceptions.exceptions import (
     MetadataStoreError,
 )
+from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

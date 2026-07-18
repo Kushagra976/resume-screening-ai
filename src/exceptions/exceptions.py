@@ -43,6 +43,14 @@ class VectorIndexError(ResumeScreeningError):
     pass
 
 
+class MetadataStoreError(ResumeScreeningError):
+    """
+    Raised when metadata storage operations fail.
+    """
+
+    pass
+
+
 class ConfigurationError(ResumeScreeningError):
     """
     Raised when the application configuration is invalid.
@@ -60,7 +68,4 @@ class RankingServiceError(ResumeScreeningError):
 
 class ResumeIndexerError(ResumeScreeningError):
     """Raised when resume indexing fails."""
-    pass
-class RankingServiceError(ResumeScreeningError):
-    """Raised when ranking resumes fails."""
     pass
