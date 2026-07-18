@@ -24,20 +24,26 @@ class VectorIndex:
         """
 
         self.dimension = dimension
-        self.index = faiss.IndexFlatIP(dimension)
+        self._index = faiss.IndexFlatIP(dimension)
 
         logger.info(
             "Initialized FAISS IndexFlatIP with dimension %d",
             dimension,
         )
 
-    def add(self, embeddings: np.ndarray) -> None:
+    def add(
+        self,
+        embeddings: np.ndarray,
+    ) -> list[int]:
         """
         Add one or more embeddings to the index.
 
         Args:
             embeddings:
-                Shape (N, dimension)
+                Shape (dimension,) or (N, dimension)
+
+        Returns:
+            List of assigned vector IDs.
         """
 
         try:
@@ -47,12 +53,33 @@ class VectorIndex:
                 dtype=np.float32,
             )
 
-            self.index.add(embeddings)
+            if embeddings.ndim == 1:
+                embeddings = embeddings.reshape(1, -1)
+
+            if embeddings.shape[1] != self.dimension:
+                raise VectorIndexError(
+                    f"Expected embedding dimension "
+                    f"{self.dimension}, got "
+                    f"{embeddings.shape[1]}"
+                )
+
+            start_id = self.size
+
+            self._index.add(embeddings)
+
+            ids = list(
+                range(
+                    start_id,
+                    start_id + embeddings.shape[0],
+                )
+            )
 
             logger.info(
                 "Added %d embeddings to FAISS index.",
                 embeddings.shape[0],
             )
+
+            return ids
 
         except Exception as e:
 
@@ -80,11 +107,16 @@ class VectorIndex:
                 Number of nearest neighbours.
 
         Returns:
-            Tuple of
-            (scores, indices)
+            Tuple:
+                (scores, indices)
         """
 
         try:
+
+            if self.size == 0:
+                raise VectorIndexError(
+                    "Vector index is empty."
+                )
 
             query_embedding = np.asarray(
                 query_embedding,
@@ -92,9 +124,19 @@ class VectorIndex:
             )
 
             if query_embedding.ndim == 1:
-                query_embedding = query_embedding.reshape(1, -1)
+                query_embedding = query_embedding.reshape(
+                    1,
+                    -1,
+                )
 
-            scores, indices = self.index.search(
+            if query_embedding.shape[1] != self.dimension:
+                raise VectorIndexError(
+                    f"Expected embedding dimension "
+                    f"{self.dimension}, got "
+                    f"{query_embedding.shape[1]}"
+                )
+
+            scores, indices = self._index.search(
                 query_embedding,
                 k,
             )
@@ -103,7 +145,7 @@ class VectorIndex:
                 "FAISS search completed."
             )
 
-            return scores, indices
+            return scores[0], indices[0]
 
         except Exception as e:
 
@@ -115,7 +157,10 @@ class VectorIndex:
                 "Unable to search FAISS index."
             ) from e
 
-    def save(self, file_path: str | Path) -> None:
+    def save(
+        self,
+        file_path: str | Path,
+    ) -> None:
         """
         Save the index to disk.
         """
@@ -130,7 +175,7 @@ class VectorIndex:
             )
 
             faiss.write_index(
-                self.index,
+                self._index,
                 str(file_path),
             )
 
@@ -149,7 +194,10 @@ class VectorIndex:
                 "Unable to save index."
             ) from e
 
-    def load(self, file_path: str | Path) -> None:
+    def load(
+        self,
+        file_path: str | Path,
+    ) -> None:
         """
         Load an existing FAISS index.
         """
@@ -158,9 +206,16 @@ class VectorIndex:
 
             file_path = Path(file_path)
 
-            self.index = faiss.read_index(
+            if not file_path.exists():
+                raise VectorIndexError(
+                    f"{file_path} does not exist."
+                )
+
+            self._index = faiss.read_index(
                 str(file_path)
             )
+
+            self.dimension = self._index.d
 
             logger.info(
                 "Loaded FAISS index from %s",
@@ -183,4 +238,4 @@ class VectorIndex:
         Number of vectors currently stored.
         """
 
-        return self.index.ntotal
+        return self._index.ntotal

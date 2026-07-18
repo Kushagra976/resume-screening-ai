@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-
-@dataclass
+@dataclass(frozen=True)
 class ResumeMetadata:
     email: str | None
     phone: str | None

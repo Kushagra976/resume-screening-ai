@@ -53,3 +53,14 @@ class ConfigurationError(ResumeScreeningError):
 class ResumeParserError(ResumeScreeningError):
     """Raised when resume metadata parsing fails."""
     pass
+
+class RankingServiceError(ResumeScreeningError):
+    """Raised when ranking resumes fails."""
+    pass
+
+class ResumeIndexerError(ResumeScreeningError):
+    """Raised when resume indexing fails."""
+    pass
+class RankingServiceError(ResumeScreeningError):
+    """Raised when ranking resumes fails."""
+    pass
