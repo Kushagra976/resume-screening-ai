@@ -5,6 +5,9 @@
 __pycache__/
 *.pyc
 
+# Local resume datasets
+data/resumes/*.pdf
+
 # Generated artifacts
 artifacts/
 *.faiss

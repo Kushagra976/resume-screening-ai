@@ -87,6 +87,12 @@ def rank_resumes(
     request: RankRequest,
     services: AppServices = Depends(get_services),
 ) -> RankResponse:
+    if services.vector_index.size == 0:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Upload at least one resume before ranking.",
+        )
+
     matches = services.ranking_service.rank(
         job_description=request.job_description,
         top_k=request.top_k,
@@ -120,7 +126,7 @@ def stats(
     return StatsResponse(
         indexed_resume_count=services.metadata_store.size,
         embedding_dimension=services.vector_index.dimension,
-        model_name=services.embedding_generator.MODEL_NAME,
+        model_name=services.embedding_generator.model_name,
     )
 
 

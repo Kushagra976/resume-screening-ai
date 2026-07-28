@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume Screening AI</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Resume Screening AI</p>
+            <h1 id="page-title">Rank candidates against a role</h1>
+          </div>
+          <div class="status-pill" id="api-status">Checking API</div>
+        </header>
+
+        <section class="metrics" aria-label="Index stats">
+          <div>
+            <span class="metric-label">Indexed resumes</span>
+            <strong id="indexed-count">0</strong>
+          </div>
+          <div>
+            <span class="metric-label">Embedding model</span>
+            <strong id="model-name">Loading</strong>
+          </div>
+          <div>
+            <span class="metric-label">Dimensions</span>
+            <strong id="embedding-dimension">-</strong>
+          </div>
+        </section>
+
+        <div class="layout">
+          <section class="panel" aria-labelledby="upload-title">
+            <div class="panel-heading">
+              <h2 id="upload-title">Resume Intake</h2>
+              <p>Upload PDF resumes to add them to the in-memory index.</p>
+            </div>
+            <form id="upload-form" class="upload-box">
+              <label for="resume-file" class="drop-zone">
+                <span class="drop-title">Choose PDF resumes</span>
+                <span id="file-summary">No files selected</span>
+              </label>
+              <input id="resume-file" name="resume-file" type="file" accept="application/pdf,.pdf" multiple />
+              <button type="submit">Upload and index</button>
+            </form>
+            <ol id="upload-list" class="activity-list" aria-live="polite"></ol>
+          </section>
+
+          <section class="panel" aria-labelledby="rank-title">
+            <div class="panel-heading">
+              <h2 id="rank-title">Role Match</h2>
+              <p>Paste a job description and return the strongest resume matches.</p>
+            </div>
+            <form id="rank-form" class="rank-form">
+              <label for="job-description">Job description</label>
+              <textarea
+                id="job-description"
+                name="job-description"
+                rows="11"
+                placeholder="Paste responsibilities, requirements, and must-have skills..."
+                required
+              ></textarea>
+              <div class="form-row">
+                <label for="top-k">Results</label>
+                <input id="top-k" name="top-k" type="number" min="1" max="25" value="5" />
+                <button type="submit">Rank resumes</button>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <section class="results-panel" aria-labelledby="results-title">
+          <div class="panel-heading">
+            <h2 id="results-title">Ranked Results</h2>
+            <p id="results-summary">Upload resumes, then run a match.</p>
+          </div>
+          <div id="results" class="results"></div>
+        </section>
+      </section>
+    </main>
+
+    <template id="result-template">
+      <article class="result-card">
+        <div class="score-block">
+          <span class="score-label">Match</span>
+          <strong class="score-value"></strong>
+        </div>
+        <div class="candidate-details">
+          <h3></h3>
+          <dl>
+            <div>
+              <dt>Email</dt>
+              <dd data-field="email"></dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd data-field="phone"></dd>
+            </div>
+            <div>
+              <dt>GitHub</dt>
+              <dd data-field="github"></dd>
+            </div>
+            <div>
+              <dt>LinkedIn</dt>
+              <dd data-field="linkedin"></dd>
+            </div>
+          </dl>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
