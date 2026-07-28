@@ -16,6 +16,22 @@ uvicorn src.api.main:app --reload
 
 Open `http://127.0.0.1:8000/app/` for the frontend.
 
+Deploy on Railway
+-----------------
+
+This repository includes a `Dockerfile` and `railway.json`, so Railway can
+build and run the FastAPI app directly.
+
+1. Push the project to GitHub.
+2. Create a new Railway project.
+3. Choose "Deploy from GitHub repo".
+4. Select this repository.
+5. Railway will detect the Dockerfile and deploy the service.
+6. Open the generated Railway URL and go to `/app/`.
+
+Railway provides the `PORT` environment variable automatically. The Docker
+start command uses it when present and falls back to port `8000` locally.
+
 API Endpoints
 -------------
 
@@ -30,3 +46,6 @@ Notes
 The vector index and metadata store are in memory for the current server
 process. Restarting the API clears uploaded resume matches until resumes are
 uploaded again.
+
+Uploaded resumes are stored on the service filesystem. On hosted platforms,
+use a persistent volume or object storage before treating uploads as durable.
